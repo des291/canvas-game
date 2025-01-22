@@ -97,8 +97,6 @@ function spawnEnemies() {
     };
     enemies.push(new Enemy(x, y, radius, colour, velocity));
   }, 1000);
-
-  console.log(enemies);
 }
 
 function animate() {
@@ -108,8 +106,16 @@ function animate() {
   projectiles.forEach((projectile) => {
     projectile.update();
   });
-  enemies.forEach((enemy) => {
+  enemies.forEach((enemy, enemy_index) => {
     enemy.update();
+
+    projectiles.forEach((projectile, projectile_index) => {
+      const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);
+      if (dist - enemy.radius - projectile.radius < 1) {
+        enemies.splice(enemy_index, 1);
+        projectiles.splice(projectile_index, 1);
+      }
+    });
   });
 }
 
@@ -123,7 +129,6 @@ addEventListener("click", (event) => {
     x: Math.cos(angle),
     y: Math.sin(angle),
   };
-  console.log(angle);
   projectiles.push(
     new Projectile(canvas.width / 2, canvas.height / 2, 5, "red", velocity)
   );
