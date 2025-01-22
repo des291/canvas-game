@@ -99,21 +99,28 @@ function spawnEnemies() {
   }, 1000);
 }
 
+let animationId;
 function animate() {
-  requestAnimationFrame(animate);
+  animationId = requestAnimationFrame(animate);
   c.clearRect(0, 0, canvas.width, canvas.height);
   player.draw();
   projectiles.forEach((projectile) => {
     projectile.update();
   });
-  enemies.forEach((enemy, enemy_index) => {
+  enemies.forEach((enemy, enemyIndex) => {
     enemy.update();
+    const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
 
-    projectiles.forEach((projectile, projectile_index) => {
+    if (dist - enemy.radius - player.radius < 1) {
+      cancelAnimationFrame(animationId);
+    }
+    projectiles.forEach((projectile, projectileIndex) => {
       const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);
       if (dist - enemy.radius - projectile.radius < 1) {
-        enemies.splice(enemy_index, 1);
-        projectiles.splice(projectile_index, 1);
+        setTimeout(() => {
+          enemies.splice(enemyIndex, 1);
+          projectiles.splice(projectileIndex, 1);
+        }, 0);
       }
     });
   });
