@@ -69,7 +69,7 @@ class Enemy {
 const x = canvas.width / 2;
 const y = canvas.height / 2;
 
-const player = new Player(x, y, 30, "blue");
+const player = new Player(x, y, 10, "white");
 
 const projectiles = [];
 const enemies = [];
@@ -150,7 +150,7 @@ addEventListener("click", (event) => {
     y: Math.sin(angle),
   };
   projectiles.push(
-    new Projectile(canvas.width / 2, canvas.height / 2, 5, "red", velocity)
+    new Projectile(canvas.width / 2, canvas.height / 2, 5, "white", velocity)
   );
 });
 
