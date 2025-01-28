@@ -66,6 +66,34 @@ class Enemy {
   }
 }
 
+class Particle {
+  constructor(x, y, radius, colour, velocity) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.colour = colour;
+    this.velocity = velocity;
+    this.alpha = 1;
+  }
+
+  draw() {
+    c.save();
+    c.globalAlpha = this.alpha;
+    c.beginPath();
+    c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    c.fillStyle = this.colour;
+    c.fill();
+    c.restore();
+  }
+
+  update() {
+    this.draw();
+    this.x = this.x + this.velocity.x;
+    this.y = this.y + this.velocity.y;
+    this.alpha -= 0.01;
+  }
+}
+
 const x = canvas.width / 2;
 const y = canvas.height / 2;
 
@@ -73,6 +101,7 @@ const player = new Player(x, y, 10, "white");
 
 const projectiles = [];
 const enemies = [];
+const particles = [];
 
 function spawnEnemies() {
   setInterval(() => {
@@ -105,6 +134,13 @@ function animate() {
   c.fillStyle = "rgba(0,0,0,0.1)";
   c.fillRect(0, 0, canvas.width, canvas.height);
   player.draw();
+  particles.forEach((particle, index) => {
+    if (particle.alpha <= 0) {
+      particles.splice(index, 1);
+    } else {
+      particle.update();
+    }
+  });
   projectiles.forEach((projectile, projectileIndex) => {
     projectile.update();
 
@@ -124,13 +160,23 @@ function animate() {
     enemy.update();
     const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
 
-    // when projectiles touch enemy
+    // end game
     if (dist - enemy.radius - player.radius < 1) {
       cancelAnimationFrame(animationId);
     }
     projectiles.forEach((projectile, projectileIndex) => {
       const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);
+
+      // when projectiles touch enemy
       if (dist - enemy.radius - projectile.radius < 1) {
+        for (let index = 0; index < 8; index++) {
+          particles.push(
+            new Particle(projectile.x, projectile.y, 3, enemy.colour, {
+              x: Math.random() - 0.5,
+              y: Math.random() - 0.5,
+            })
+          );
+        }
         if (enemy.radius - 10 > 5) {
           gsap.to(enemy, {
             radius: enemy.radius - 10,
