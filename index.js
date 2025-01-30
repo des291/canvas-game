@@ -66,6 +66,7 @@ class Enemy {
   }
 }
 
+const friction = 0.99;
 class Particle {
   constructor(x, y, radius, colour, velocity) {
     this.x = x;
@@ -88,6 +89,8 @@ class Particle {
 
   update() {
     this.draw();
+    this.velocity.x *= friction;
+    this.velocity.y *= friction;
     this.x = this.x + this.velocity.x;
     this.y = this.y + this.velocity.y;
     this.alpha -= 0.01;
@@ -169,12 +172,19 @@ function animate() {
 
       // when projectiles touch enemy
       if (dist - enemy.radius - projectile.radius < 1) {
-        for (let index = 0; index < 8; index++) {
+        // create explosions
+        for (let index = 0; index < enemy.radius * 2; index++) {
           particles.push(
-            new Particle(projectile.x, projectile.y, 3, enemy.colour, {
-              x: Math.random() - 0.5,
-              y: Math.random() - 0.5,
-            })
+            new Particle(
+              projectile.x,
+              projectile.y,
+              Math.random() * 2,
+              enemy.colour,
+              {
+                x: (Math.random() - 0.5) * (Math.random() * 6),
+                y: (Math.random() - 0.5) * (Math.random() * 6),
+              },
+            ),
           );
         }
         if (enemy.radius - 10 > 5) {
@@ -198,7 +208,7 @@ function animate() {
 addEventListener("click", (event) => {
   const angle = Math.atan2(
     event.clientY - canvas.height / 2,
-    event.clientX - canvas.width / 2
+    event.clientX - canvas.width / 2,
   );
 
   const velocity = {
@@ -206,7 +216,7 @@ addEventListener("click", (event) => {
     y: Math.sin(angle) * 4,
   };
   projectiles.push(
-    new Projectile(canvas.width / 2, canvas.height / 2, 5, "white", velocity)
+    new Projectile(canvas.width / 2, canvas.height / 2, 5, "white", velocity),
   );
 });
 
